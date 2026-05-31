@@ -1,0 +1,18 @@
+Subject: Your cast.onion station has been suspended
+
+Hello {{ name }},
+
+Your station "{{ station_name }}" on cast.onion has been temporarily suspended.
+
+{% if reason %}
+Reason: {{ reason }}
+{% endif %}
+
+During this period, your station key and access token have been invalidated and your stream will not be accessible to listeners.
+
+If you believe this was in error or would like to discuss reinstatement, please reply to this email.
+
+---
+
+cast.onion
+private internet radio

@@ -1,0 +1,21 @@
+Subject: Your cast.onion application has been received
+
+Hello {{ name }},
+
+Thank you for applying to broadcast on cast.onion.
+
+We have received your application for "{{ station_name }}" and it is now under review by our team.
+
+You can expect a response within the next 48 hours. Once reviewed, you will receive a follow-up email at this address with the outcome.
+
+---
+
+Application details:
+  Station name: {{ station_name }}
+  Genre: {{ genre }}
+  Application ID: {{ application_id }}
+
+---
+
+cast.onion
+private internet radio

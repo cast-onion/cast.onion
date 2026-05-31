@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dashboard — cast.onion admin</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0a0a0a; --bg2: #111; --bg3: #161616; --border: #222;
+            --text: #e0e0e0; --muted: #555; --accent: #c8ff00;
+            --danger: #ff4444; --warn: #ffaa00; --ok: #44cc88;
+            --font: 'Courier New', monospace;
+        }
+        body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 13px; }
+        a { color: var(--accent); text-decoration: none; }
+        header { display: flex; align-items: center; justify-content: space-between; padding: 16px 28px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
+        .wordmark { color: var(--accent); font-size: 15px; font-weight: bold; }
+        .header-right { display: flex; align-items: center; gap: 16px; color: var(--muted); }
+        .toast-area { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+        .toast { padding: 4px 12px; border-radius: 3px; font-size: 12px; font-weight: bold; animation: fadeIn .2s ease; }
+        .toast-ok   { background: #001a0d; color: var(--ok);   border: 1px solid var(--ok); }
+        .toast-deny { background: #1a0000; color: var(--danger); border: 1px solid var(--danger); }
+        @keyframes fadeIn { from { opacity:0; transform: translateY(-4px); } to { opacity:1; transform: translateY(0); } }
+        .btn { display: inline-block; padding: 5px 12px; border-radius: 3px; font-family: var(--font); font-size: 12px; cursor: pointer; border: none; font-weight: bold; }
+        .btn-danger  { background: var(--danger); color: #fff; }
+        .btn-warn    { background: var(--warn); color: #000; }
+        .btn-ok      { background: var(--ok); color: #000; }
+        .btn-restart { background: var(--bg3); border: 1px solid var(--border); color: var(--text); }
+        .btn-restart:hover { border-color: var(--danger); color: var(--danger); }
+        .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); min-height: calc(100vh - 53px); }
+        .panel { background: var(--bg); padding: 24px 28px; overflow-y: auto; }
+        .panel-full { grid-column: 1 / -1; }
+        .panel-title { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; font-size: 11px; color: var(--muted); padding: 0 0 8px 0; border-bottom: 1px solid var(--border); font-weight: normal; }
+        td { padding: 10px 0; border-bottom: 1px solid var(--bg3); vertical-align: top; }
+        td:last-child { text-align: right; }
+        .status { display: inline-block; padding: 2px 7px; border-radius: 2px; font-size: 11px; }
+        .status-pending   { background: #1a1500; color: var(--warn);   border: 1px solid var(--warn); }
+        .status-approved  { background: #001a0d; color: var(--ok);     border: 1px solid var(--ok); }
+        .status-denied    { background: #1a0000; color: var(--danger); border: 1px solid var(--danger); }
+        .status-active    { background: #001a0d; color: var(--ok);     border: 1px solid var(--ok); }
+        .status-suspended { background: #1a1500; color: var(--warn);   border: 1px solid var(--warn); }
+        .status-revoked   { background: #1a0000; color: var(--danger); border: 1px solid var(--danger); }
+        .actions { display: flex; gap: 6px; justify-content: flex-end; }
+        .mono { font-family: var(--font); font-size: 11px; color: var(--muted); word-break: break-all; max-width: 200px; }
+        .empty { color: var(--muted); padding: 20px 0; font-size: 12px; }
+        .log-row td { font-size: 12px; color: var(--muted); }
+        .log-action { color: var(--text); }
+        .key-cell { font-size: 10px; color: var(--muted); word-break: break-all; max-width: 180px; }
+        tr.removing { opacity: 0; transition: opacity .3s ease; }
+    </style>
+</head>
+<body>
+<header>
+    <span class="wordmark">cast.onion / admin</span>
+    <div class="header-right">
+        <div class="toast-area" id="toast-area"></div>
+        <span>{{.Username}}</span>
+        <form method="POST" action="/admin/restart" style="display:inline" onsubmit="return confirm('restart server?')">
+            <button class="btn btn-restart">restart server</button>
+        </form>
+        <a href="/admin/logout">logout</a>
+    </div>
+</header>
+
+<div class="layout">
+
+    <div class="panel">
+        <div class="panel-title">applications</div>
+        {{if .Applications}}
+        <table id="apps-table">
+            <tr><th>station</th><th>contact</th><th>status</th><th>actions</th></tr>
+            {{range .Applications}}
+            <tr id="app-{{.ID}}">
+                <td>
+                    {{.StationName}}<br>
+                    <span style="color:var(--muted);font-size:11px">{{.Genre}}</span>
+                </td>
+                <td style="color:var(--muted)">{{.ContactEmail}}</td>
+                <td><span class="status status-{{.Status}}">{{.Status}}</span></td>
+                <td>
+                    {{if eq .Status "pending"}}
+                    <div class="actions">
+                        <button class="btn btn-ok"     onclick="reviewApp('{{.ID}}', 'approve', '{{.StationName}}')">approve</button>
+                        <button class="btn btn-danger" onclick="reviewApp('{{.ID}}', 'deny',    '{{.StationName}}')">deny</button>
+                    </div>
+                    {{else}}
+                    <span style="color:var(--muted);font-size:11px">reviewed</span>
+                    {{end}}
+                </td>
+            </tr>
+            {{end}}
+        </table>
+        {{else}}
+        <div class="empty" id="apps-empty">no applications yet</div>
+        {{end}}
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">stations</div>
+        {{if .Stations}}
+        <table>
+            <tr><th>name</th><th>status</th><th>key / token</th><th>actions</th></tr>
+            {{range .Stations}}
+            <tr>
+                <td>{{.DisplayName}}</td>
+                <td><span class="status status-{{.Status}}">{{.Status}}</span></td>
+                <td>
+                    {{if index $.Keys .ID}}
+                    <div class="key-cell">key: {{index $.Keys .ID}}</div>
+                    {{end}}
+                    {{if index $.Tokens .ID}}
+                    <div class="key-cell">tok: {{index $.Tokens .ID}}</div>
+                    {{end}}
+                </td>
+                <td>
+                    <div class="actions">
+                        {{if eq .Status "active"}}
+                        <form method="POST" action="/admin/suspend/{{.ID}}"><button class="btn btn-warn">suspend</button></form>
+                        {{end}}
+                        {{if ne .Status "revoked"}}
+                        <form method="POST" action="/admin/revoke/{{.ID}}"><button class="btn btn-danger">revoke</button></form>
+                        {{end}}
+                    </div>
+                </td>
+            </tr>
+            {{end}}
+        </table>
+        {{else}}
+        <div class="empty">no stations yet</div>
+        {{end}}
+    </div>
+
+    <div class="panel panel-full">
+        <div class="panel-title">audit log</div>
+        {{if .Actions}}
+        <table>
+            <tr><th>time</th><th>admin</th><th>action</th><th>target</th><th>reason</th></tr>
+            {{range .Actions}}
+            <tr class="log-row">
+                <td>{{timeAgo .CreatedAt}}</td>
+                <td>{{.AdminID}}</td>
+                <td class="log-action">{{.Action}}</td>
+                <td class="mono">{{.TargetType}} / {{.TargetID}}</td>
+                <td style="color:var(--muted)">{{.Reason}}</td>
+            </tr>
+            {{end}}
+        </table>
+        {{else}}
+        <div class="empty">no actions logged yet</div>
+        {{end}}
+    </div>
+
+</div>
+
+<script>
+function toast(msg, type) {
+    const area = document.getElementById('toast-area');
+    const t = document.createElement('div');
+    t.className = 'toast toast-' + type;
+    t.textContent = msg;
+    area.appendChild(t);
+    setTimeout(function() {
+        t.style.opacity = '0';
+        t.style.transition = 'opacity .3s';
+        setTimeout(function() { t.remove(); }, 300);
+    }, 4000);
+}
+
+function reviewApp(id, action, name) {
+    fetch('/admin/' + action + '/' + id, { method: 'POST' })
+    .then(function(r) {
+        if (!r.ok) throw new Error();
+        const row = document.getElementById('app-' + id);
+        if (row) {
+            row.classList.add('removing');
+            setTimeout(function() { row.remove(); }, 300);
+        }
+        if (action === 'approve') {
+            toast('approved: ' + name, 'ok');
+        } else {
+            toast('denied: ' + name, 'deny');
+        }
+    })
+    .catch(function() {
+        toast('action failed', 'deny');
+    });
+}
+</script>
+</body>
+</html>

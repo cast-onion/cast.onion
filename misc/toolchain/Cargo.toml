@@ -1,0 +1,25 @@
+[package]
+name = "cast-onion-toolchain"
+version = "0.1.0"
+edition = "2021"
+description = "dev tools and helpers for cast.onion"
+
+[[bin]]
+name = "gen-key"
+path = "src/gen_key.rs"
+
+[[bin]]
+name = "check-stream"
+path = "src/check_stream.rs"
+
+[[bin]]
+name = "hash-token"
+path = "src/hash_token.rs"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+reqwest = { version = "0.11", features = ["json"] }
+sha2 = "0.10"
+hex = "0.4"
+rand = "0.8"
+base64 = "0.22"

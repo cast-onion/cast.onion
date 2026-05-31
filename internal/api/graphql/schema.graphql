@@ -1,0 +1,30 @@
+type Station {
+  id:          ID!
+  slug:        String!
+  displayName: String!
+  description: String
+  genre:       String
+  websiteUrl:  String
+  artUrl:      String
+  status:      StationStatus!
+  createdAt:   String!
+}
+
+enum StationStatus {
+  ACTIVE
+  SUSPENDED
+  REVOKED
+}
+
+type ApplicationStatus {
+  id:        ID!
+  status:    String!
+  stationId: String
+}
+
+type Query {
+  directory:                    [Station!]!
+  station(id: ID!):             Station
+  stationBySlug(slug: String!): Station
+  applicationStatus(id: ID!):   ApplicationStatus
+}

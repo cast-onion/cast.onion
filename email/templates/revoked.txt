@@ -1,0 +1,18 @@
+Subject: Your cast.onion station has been revoked
+
+Hello {{ name }},
+
+Your station "{{ station_name }}" on cast.onion has been permanently revoked.
+
+{% if reason %}
+Reason: {{ reason }}
+{% endif %}
+
+Your station key and access token are no longer valid and your station has been removed from the directory.
+
+This action is final.
+
+---
+
+cast.onion
+private internet radio

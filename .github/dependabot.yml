@@ -1,0 +1,23 @@
+version: 2
+updates:
+  # Go modules in root
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # Rust (Cargo) in /app and /email
+  - package-ecosystem: "cargo"
+    directory: "/app"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "cargo"
+    directory: "/email"
+    schedule:
+      interval: "weekly"
+
+  # Svelte (npm) in /web
+  - package-ecosystem: "npm"
+    directory: "/web"
+    schedule:
+      interval: "weekly"   

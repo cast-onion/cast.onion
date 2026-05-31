@@ -1,0 +1,35 @@
+Subject: Your cast.onion application has been approved
+
+Hello {{ name }},
+
+We are pleased to inform you that your application to broadcast on cast.onion has been approved.
+
+Your station "{{ station_name }}" is now active on the network.
+
+---
+
+Your credentials are below. Please save them securely — they will not be sent again.
+
+Station Key (use this to authenticate your stream to the broadcast server):
+
+  {{ station_key }}
+
+Access Token (use this to log into the station owner dashboard):
+
+  {{ access_token }}
+
+---
+
+Getting started:
+
+1. Download the cast.onion desktop app
+2. Open the Broadcast tab and enter your Access Token
+3. Enter your Station Key and select your microphone
+4. Click "microphone" to go live
+
+If you have any questions, reply to this email.
+
+---
+
+cast.onion
+private internet radio

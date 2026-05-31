@@ -1,0 +1,18 @@
+Subject: Your cast.onion application
+
+Hello {{ name }},
+
+Thank you for your interest in broadcasting on cast.onion.
+
+After reviewing your application for "{{ station_name }}", we are unable to approve it at this time.
+
+{% if reason %}
+Reason: {{ reason }}
+{% endif %}
+
+You are welcome to submit a new application in the future if your circumstances change.
+
+---
+
+cast.onion
+private internet radio

@@ -1,0 +1,46 @@
+name: cast-onion
+base: core22
+version: cast.onion Radio Client
+description: |
+  The official cast.onion client to connect to the cast.onion radio netwrok.
+
+gradle: stable
+confinement: strict
+
+apps:
+  cast-onion:
+    command: usr/bin/cast-onion-app
+    extensions: []
+    plugs:
+      - network
+      - network-bind
+      - audio-playback
+      - home
+      - x11
+      - desktop
+      - desktop-legacy
+
+parts:
+  cast-onion:
+    plugin: nil
+    source: .
+    build-packages:
+      - cargo
+      - rustc
+      - pkg-config
+      - libssl-dev
+      - build-essential
+
+    override-build: |
+    cargo build --release
+    strip target/release/cast-onion-app
+
+      install -Dm755 target/release/cast-onion-app \
+        $SNAPCRAFT_PART_INSTALL/usr/bin/cast-onion-app
+
+    stage-packages:
+      - libasound2
+      - libx11-6
+      - libxcbi
+      - libgli
+      - libss13

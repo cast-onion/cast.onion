@@ -1,0 +1,18 @@
+# [CLIENT]
+app/Cargo.lock
+app/target
+
+# [WEBSITE]
+web/package-lock.json
+web/node_modules
+web/.svelte-kit
+web/dist
+web-landing/web
+
+# [BACKEND]
+scripts/__pycache__
+email/target
+email/Cargo.lock
+
+# [REPO]
+.env
