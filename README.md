@@ -22,7 +22,7 @@ go run ./cmd/server
 
 ## Issues
 
-If you find any issues within the client or service, please make a issue in [Issues](https://github.com/ItsBr0dyy/cast.onion/issues/new).
+If you find any issues within the client or service, please make a issue in [Issues](https://github.com/cast-onion/cast.onion/issues/new).
 
 Include info like:
 
